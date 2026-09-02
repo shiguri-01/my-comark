@@ -7,6 +7,8 @@ catalogMode: prefer
 
 catalog:
   "@types/node": ^24
+  comark: ^0.6.2
+  markdown-exit: ^1.3.0
   typescript: ^7.0.2
   vite: npm:@voidzero-dev/vite-plus-core@0.3.0
   vite-plus: 0.3.0
