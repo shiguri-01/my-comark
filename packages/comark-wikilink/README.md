@@ -6,41 +6,21 @@ This plugin adds support for `[[target]]` and `[[target|label]]` wikilink syntax
 
 It supports two rendering modes:
 
-- `a` mode — renders wikilinks as regular `<a>` elements
-- `component` mode — renders wikilinks as `wikilink` components, allowing applications to resolve and render links dynamically
-
-It is in `a` mode by default.
+- `a` mode (Default) —
+  Parses wikilinks into standard link (`a`) nodes,
+  producing the same AST output as standard markdown link syntax `[label](target)`.
+- `component` mode —
+  Parses wikilinks into custom `wikilink` nodes,
+  allowing you to control how links are resolved and rendered via a custom component.
 
 ## `a` mode
 
-Use `mode: "a"` to render wikilinks directly as regular links.
-
 ```ts
-import { parseMarkdown } from "comark";
-import wikilink from "comark-wikilink";
-
-const tree = await parseMarkdown("[[docs/getting-started]]", {
-  plugins: [wikilink({ mode: "a" })],
-});
+wikilink({ mode: "a" });
 ```
 
-`[[docs/getting-started]]` is rendered as a regular link:
-
-```html
-<a href="docs/getting-started">docs/getting-started</a>
-```
-
-An explicit label can be provided with `|`:
-
-```md
-[[docs/getting-started|Getting started]]
-```
-
-which renders as:
-
-```html
-<a href="docs/getting-started">Getting started</a>
-```
+Wikilinks are parsed into the same `a` nodes as regular Markdown links.
+They can be rendered and customized through the same pipeline as other links, without any wikilink-specific handling.
 
 ### Configuration
 
@@ -53,44 +33,40 @@ which renders as:
 ```
 
 | Option         | Default | Description                                                                                                                            |
-| -------------- | ------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| :------------- | :------ | :------------------------------------------------------------------------------------------------------------------------------------- |
 | `resolveHref`  | `null`  | A function that transforms a wikilink target into the `href` used by the generated `<a>` element. If `null`, the target is used as-is. |
 | `resolveLabel` | `null`  | A function that resolves the label displayed for wikilinks that do not specify an explicit label. If `null`, the target is used as-is. |
 
 ## `component` mode
 
-Use `mode: "component"` when wikilinks need to be resolved by your application.
-
 ```ts
-import { parseMarkdown } from "comark";
-import wikilink from "comark-wikilink";
-
-const tree = await parseMarkdown("[[getting-started]]", {
-  plugins: [wikilink({ mode: "component" })],
-});
+wikilink({ mode: "component" });
 ```
 
-Instead of creating an `<a>` element directly, the plugin produces a `wikilink` node with the wikilink data:
+In `component` mode, wikilinks are parsed into custom wikilink nodes, allowing them to be handled separately from regular links.
+Unlike `a` mode, `component` mode preserves whether a label was explicitly specified.
 
-```ts
-["wikilink", { target: "getting-started" }];
-```
+Use `mode: "component"` when wikilinks need to be handled differently from regular links.
 
-With an explicit label:
+### AST Output
+
+For example:
 
 ```md
+[[getting-started]]
 [[getting-started|Getting started]]
 ```
 
-the node contains:
+The resulting AST nodes are:
 
-```ts
-["wikilink", { target: "getting-started", label: "Getting started" }];
+```json
+["wikilink", { "target": "getting-started" }]
+["wikilink", { "target": "getting-started", "label": "Getting started" }]
 ```
 
-This allows the renderer to resolve the target and decide how the wikilink should be displayed.
+The wikilink node has no children, so a wikilink component must be provided by the renderer.
 
-For example, with React:
+### Example
 
 ```tsx
 import { Markdown } from "@comark/react";
