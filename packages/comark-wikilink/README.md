@@ -46,7 +46,7 @@ which renders as:
 
 ```ts
 {
-  mode: "a",
+  mode: "a";
   resolveHref?: (target: string) => string | null;
   resolveLabel?: (target: string) => string | null;
 }
