@@ -2,41 +2,50 @@ import { defineComarkPlugin, type MarkdownItPlugin } from "comark";
 import { type StateInline } from "markdown-exit";
 
 const OPEN = 0x5b; // [
-const CLOSE = 0x5d; // ]
-const PIPE = 0x7c; // |
-const NEWLINE = 0x0a; // \n
+const WIKILINK_RE = /^\[\[((?:(?!\]\])[^\n[])*)\]\]/;
+
+type Wikilink = { target: string; label: string | null };
+
+function parseWikilinkBody(body: string): Wikilink | null {
+  const pipeIndex = body.indexOf("|");
+  const hasLabel = pipeIndex !== -1;
+
+  const target = (hasLabel ? body.slice(0, pipeIndex) : body).trim();
+  const label = hasLabel ? body.slice(pipeIndex + 1).trim() : null;
+
+  if (!target) {
+    return null;
+  }
+  // `[[target|]]`のように`|`はあるがlabelが空なら無効
+  if (hasLabel && !label) {
+    return null;
+  }
+
+  return { target, label };
+}
 
 /**
  * Configuration for the `a` mode.
  */
-type AConfig = {
-  mode: "a";
-
+type AnchorConfig = {
   /**
    * Resolves the `href` attribute from the wikilink target.
    *
-   * If omitted, the target is used as-is.
+   * If `null`, the `target` is used as-is.
    *
-   * @default undefined
+   * @default null
    */
-  resolveHref?: ((target: string) => string) | undefined;
+  resolveHref?: ((target: string) => string) | null;
 
   /**
    * Resolves the label displayed for the wikilink.
    *
    * This is only used when the wikilink does not specify an explicit label.
-   * If omitted, the target is used as the label.
+   * If `null`, the target is used as the label.
    *
-   * @default undefined
+   * @default null
    */
-  resolveLabel?: ((target: string) => string) | undefined;
-};
-
-/**
- * Configuration for the `component` mode.
- */
-type ComponentConfig = {
-  mode: "component";
+  resolveLabel?: ((target: string) => string) | null;
 };
 
 /**
@@ -46,88 +55,77 @@ type ComponentConfig = {
  *
  * Use `mode: "component"` to convert wikilinks into a `wikilink` node that can be rendered with a custom component.
  */
-export type WikilinkConfig = AConfig | ComponentConfig;
+export type WikilinkConfig = ({ mode: "a" } & AnchorConfig) | { mode: "component" };
+
+function pushAnchorToken(
+  state: StateInline,
+  { href, content }: { href: string; content: string },
+): void {
+  const openToken = state.push("link_open", "a", 1);
+  openToken.attrSet("href", href);
+  openToken.markup = "[[";
+
+  const textToken = state.push("text", "", 0);
+  textToken.content = content;
+
+  state.push("link_close", "a", -1);
+}
+
+function pushComponentToken(state: StateInline, { target, label }: Wikilink): void {
+  const openToken = state.push("mdc_inline_component", "wikilink", 1);
+  openToken.markup = "[[";
+
+  state.push("mdc_inline_component", "wikilink", -1);
+
+  // close直後にmdc_inline_propsを置くと、
+  // Comark側がコンポーネントのattrsとして扱ってくれる
+  const propsToken = state.push("mdc_inline_props", "", 0);
+  propsToken.hidden = true;
+  propsToken.attrSet("target", target);
+  if (label !== null) {
+    propsToken.attrSet("label", label);
+  }
+}
 
 const createWikilinkRule =
   (config: WikilinkConfig) =>
   (state: StateInline, silent: boolean): boolean => {
-    const start = state.pos;
-    const max = state.posMax;
-
-    // 最低でも [[x]] が必要
-    if (start + 4 >= max) return false;
-
     // [[から始まるか
+    const start = state.pos;
     if (state.src.charCodeAt(start) !== OPEN) return false;
     if (state.src.charCodeAt(start + 1) !== OPEN) return false;
 
-    let pos = start + 2;
-    let pipePos = -1;
-
-    while (pos < max) {
-      const code = state.src.charCodeAt(pos);
-
-      // 改行やネストした`[`は wikilink として扱わない
-      if (code === NEWLINE || code === OPEN) return false;
-
-      if (code === PIPE && pipePos === -1) {
-        pipePos = pos;
-      }
-
-      // `]]`を見つけたらwikilink
-      if (code === CLOSE && state.src.charCodeAt(pos + 1) === CLOSE) {
-        const shouldHaveLabel = pipePos !== -1;
-
-        const target = shouldHaveLabel
-          ? state.src.slice(start + 2, pipePos).trim()
-          : state.src.slice(start + 2, pos).trim();
-        const label = shouldHaveLabel ? state.src.slice(pipePos + 1, pos).trim() : null;
-
-        // targetは必須
-        if (!target) return false;
-        // `[[target|]]`のように`|`はあるがlabelが空の場合は無効
-        if (shouldHaveLabel && !label) return false;
-
-        if (!silent) {
-          if (config.mode === "component") {
-            // mdc_inline_componentのopen/closeペアとしてpush する。
-            state.push("mdc_inline_component", "wikilink", 1);
-
-            const textToken = state.push("text", "", 0);
-            textToken.markup = "[[";
-
-            state.push("mdc_inline_component", "wikilink", -1);
-
-            // close直後にmdc_inline_propsを置くと、
-            // Comark側がコンポーネントのattrsとして扱ってくれる
-            const propsToken = state.push("mdc_inline_props", "", 0);
-            propsToken.hidden = true;
-            propsToken.attrSet("target", target);
-            if (label !== null) {
-              propsToken.attrSet("label", label);
-            }
-          } else if (config.mode === "a") {
-            const openToken = state.push("link_open", "a", 1);
-            openToken.attrSet("href", config.resolveHref ? config.resolveHref(target) : target);
-            openToken.markup = "[[";
-
-            const textToken = state.push("text", "", 0);
-            textToken.content =
-              label ?? (config.resolveLabel ? config.resolveLabel(target) : target);
-
-            state.push("link_close", "a", -1);
-          }
-        }
-
-        state.pos = pos + 2;
-        return true;
-      }
-
-      pos++;
+    const rest = state.src.slice(state.pos);
+    const match = WIKILINK_RE.exec(rest);
+    if (!match) {
+      return false;
     }
 
-    // `]]`が見つからなかった場合はwikilinkでない
-    return false;
+    const parsed = parseWikilinkBody(match[1]);
+    if (!parsed) {
+      return false;
+    }
+
+    const { target, label } = parsed;
+
+    if (config.mode === "a") {
+      const rawHref = config.resolveHref ? config.resolveHref(target) : target;
+      const href = state.md.normalizeLink(rawHref);
+      if (!state.md.validateLink(href)) return false;
+
+      const content = label ?? (config.resolveLabel ? config.resolveLabel(target) : target);
+
+      if (!silent) {
+        pushAnchorToken(state, { href, content });
+      }
+    } else if (config.mode === "component") {
+      if (!silent) {
+        pushComponentToken(state, { target, label });
+      }
+    }
+
+    state.pos = match.index + match[0].length;
+    return true;
   };
 
 /**
@@ -191,7 +189,7 @@ const createWikilinkRule =
  * }
  *  ```
  */
-export default defineComarkPlugin<WikilinkConfig>((config = { mode: "component" }) => {
+export default defineComarkPlugin<WikilinkConfig>((config = { mode: "a" }) => {
   const plugin: MarkdownItPlugin = (md) => {
     md.inline.ruler.before("link", "wikilink", createWikilinkRule(config));
   };
