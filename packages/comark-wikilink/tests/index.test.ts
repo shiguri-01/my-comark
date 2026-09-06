@@ -1,5 +1,6 @@
 import { parseMarkdown } from "comark";
 import { describe, expect, it } from "vite-plus/test";
+
 import wikilink, { type WikilinkConfig } from "../src/index";
 
 async function parseWithWikilinkComponent(

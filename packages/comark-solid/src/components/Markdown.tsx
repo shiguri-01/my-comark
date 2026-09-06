@@ -2,6 +2,7 @@ import { parseMarkdown } from "comark";
 import type { ParserOptions, MarkdownDocument as MarkdownDocumentType } from "comark";
 import { isMarkdownDocument } from "comark/utils";
 import { createMemo, type Component } from "solid-js";
+
 import { MarkdownDocument, type MarkdownDocumentProps } from "./MarkdownDocument";
 
 export interface MarkdownProps extends Omit<MarkdownDocumentProps, "value"> {

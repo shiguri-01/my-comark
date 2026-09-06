@@ -2,6 +2,7 @@ import { dynamic, mergeProps, type JSX } from "@solidjs/web";
 import type { MarkdownDocument as MarkdownDocumentType, Node, NodeRenderData } from "comark";
 import { resolveAttributes } from "comark/utils";
 import { createMemo, Loading, type Component, type ValidComponent } from "solid-js";
+
 import { getAttributes, getChildren, getTag } from "../utils/ast";
 
 export interface MarkdownDocumentProps {

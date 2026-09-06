@@ -1,5 +1,5 @@
-import { defineConfig } from "vite-plus";
 import solid from "unplugin-solid/rolldown";
+import { defineConfig } from "vite-plus";
 
 export default defineConfig({
   pack: {
