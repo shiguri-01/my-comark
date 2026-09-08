@@ -22,9 +22,9 @@ export interface MarkdownDocumentProps {
   components?: Record<string, ValidComponent>;
 
   /**
-   * Runtime data referenced by `:`-prefixed props.
+   * Runtime values referenced from markdown via `:prop="data.path"`.
    *
-   * @default undefined
+   * @default `{}`
    */
   data?: Record<string, unknown>;
 
@@ -223,7 +223,7 @@ function createNodeRenderer(components: Record<string, ValidComponent>) {
  *  ```
  */
 export const MarkdownDocument: Component<MarkdownDocumentProps> = (_props) => {
-  const props = mergeProps({ components: {}, data: undefined, class: undefined }, _props);
+  const props = mergeProps({ components: {}, data: {}, class: undefined }, _props);
 
   const renderedNodes = createMemo(() => {
     const renderNode = createNodeRenderer(props.components);
@@ -233,7 +233,7 @@ export const MarkdownDocument: Component<MarkdownDocumentProps> = (_props) => {
     const renderData: NodeRenderData = {
       frontmatter: document.frontmatter,
       meta: document.meta,
-      data: props.data ?? {},
+      data: props.data,
       props: {},
     };
 
