@@ -1,29 +1,28 @@
-# Vite+ Monorepo Starter
+# my-comark
 
-A starter for creating a Vite+ monorepo.
+A collection of plugins and renderers for [Comark](https://github.com/Comarkdown/comark).
+
+| Package                                         | Description                          |
+| :---------------------------------------------- | :----------------------------------- |
+| [`comark-solid`](./packages/comark-solid)       | Solid.js renderer for Comark         |
+| [`comark-cjk`](./packages/comark-cjk)           | CJK-friendly emphasis parsing plugin |
+| [`comark-wikilink`](./packages/comark-wikilink) | Wikilink (`[[...]]`) syntax plugin   |
 
 ## Development
 
-- Check everything is ready:
+This repository is managed with [Vite+](https://viteplus.dev).
+
+### Setup
 
 ```bash
-vp run ready
+vp install
+vp config
 ```
 
-- Run the tests:
+### Common Commands
 
 ```bash
+vp check
 vp run -r test
-```
-
-- Build the monorepo:
-
-```bash
 vp run -r build
-```
-
-- Run the development server:
-
-```bash
-vp run dev
 ```
