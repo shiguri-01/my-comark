@@ -154,7 +154,7 @@ function createNodeRenderer(components: Record<string, ValidComponent>) {
     }
 
     const children = getChildren(node)
-      .map((child) => renderNode(child, context))
+      .map((child) => renderNode(child, { ...context, parent: node }))
       .filter(Boolean);
 
     return <Component {...props}>{children}</Component>;
@@ -197,10 +197,9 @@ function createNodeRenderer(components: Record<string, ValidComponent>) {
 
   return renderNode;
 }
-
-// TODO: lazyの挙動は要確認（型は合ってる）
 /**
  * Renders a parsed Markdown document using Solid components.
+
  *
  * Supports custom components mapping for element tags.
  *

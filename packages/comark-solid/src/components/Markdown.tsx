@@ -1,5 +1,6 @@
+import { mergeProps } from "@solidjs/web";
 import { parseMarkdown } from "comark";
-import type { ParserOptions, MarkdownDocument as MarkdownDocumentType } from "comark";
+import type { MarkdownDocument as MarkdownDocumentType, ParserOptions } from "comark";
 import { isMarkdownDocument } from "comark/utils";
 import { createMemo, type Component, type ValidComponent } from "solid-js";
 
@@ -77,7 +78,9 @@ export interface MarkdownProps extends Omit<MarkdownDocumentProps, "value"> {
  * }
  * ```
  */
-export const Markdown: Component<MarkdownProps> = (props) => {
+export const Markdown: Component<MarkdownProps> = (_props) => {
+  const props = mergeProps({ components: {}, data: {} }, _props);
+
   const document = createMemo(() => {
     const value = props.value;
     return isMarkdownDocument(value) ? value : parseMarkdown(value as string, props.options);

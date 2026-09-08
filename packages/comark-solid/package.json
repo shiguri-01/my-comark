@@ -1,23 +1,29 @@
 {
   "name": "comark-solid",
-  "version": "0.0.0",
-  "description": "A starter for creating a TypeScript package.",
-  "homepage": "https://github.com/author/library#readme",
+  "version": "0.0.1",
+  "description": "Solid renderer for Comark.",
+  "keywords": [
+    "comark",
+    "markdown",
+    "solid",
+    "solidjs"
+  ],
+  "homepage": "https://github.com/shiguri-01/my-comark#readme",
   "bugs": {
-    "url": "https://github.com/author/library/issues"
+    "url": "https://github.com/shiguri-01/my-comark/issues"
   },
   "license": "MIT",
-  "author": "Author Name <author.name@mail.com>",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/author/library.git"
+  "author": {
+    "name": "shiguri",
+    "url": "https://github.com/shiguri-01"
   },
   "files": [
     "dist"
   ],
   "type": "module",
+  "types": "./dist/index.d.ts",
   "exports": {
-    ".": "./dist/index.mjs",
+    ".": "./dist/index.js",
     "./package.json": "./package.json"
   },
   "publishConfig": {
@@ -31,10 +37,13 @@
     "prepublishOnly": "vp run build"
   },
   "devDependencies": {
+    "@solidjs/testing-library": "catalog:",
     "@solidjs/web": "catalog:",
+    "@testing-library/jest-dom": "catalog:",
     "@types/node": "^26.1.1",
     "bumpp": "^11.1.0",
     "comark": "catalog:",
+    "jsdom": "catalog:",
     "solid-js": "catalog:",
     "typescript": "^7.0.2",
     "unplugin-solid": "catalog:",
