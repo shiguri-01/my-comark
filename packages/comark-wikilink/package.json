@@ -40,6 +40,7 @@
     "dev": "vp pack --watch",
     "test": "vp test",
     "check": "vp check",
+    "bump": "bumpp",
     "prepublishOnly": "vp run build"
   },
   "devDependencies": {

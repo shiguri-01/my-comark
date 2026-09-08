@@ -13,6 +13,12 @@ It supports two rendering modes:
   Parses wikilinks into custom `wikilink` nodes,
   allowing you to control how links are resolved and rendered via a custom component.
 
+## Installation
+
+```bash
+npm install comark-wikilink comark
+```
+
 ## `a` mode
 
 ```ts

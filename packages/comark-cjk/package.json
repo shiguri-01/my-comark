@@ -1,16 +1,21 @@
 {
   "name": "comark-cjk",
   "version": "0.0.0",
+  "private": true,
   "description": "A starter for creating a TypeScript package.",
-  "homepage": "https://github.com/author/library#readme",
+  "homepage": "https://github.com/shiguri-01/my-comark#readme",
   "bugs": {
-    "url": "https://github.com/author/library/issues"
+    "url": "https://github.com/shiguri-01/my-comark/issues"
   },
   "license": "MIT",
-  "author": "Author Name <author.name@mail.com>",
+  "author": {
+    "name": "shiguri",
+    "url": "https://github.com/shiguri-01"
+  },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/author/library.git"
+    "url": "git+https://github.com/shiguri-01/my-comark.git",
+    "directory": "packages/comark-cjk"
   },
   "files": [
     "dist"
@@ -28,6 +33,7 @@
     "dev": "vp pack --watch",
     "test": "vp test",
     "check": "vp check",
+    "bump": "bumpp",
     "prepublishOnly": "vp run build"
   },
   "dependencies": {

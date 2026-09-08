@@ -2,6 +2,12 @@
 
 A [Comark](https://github.com/Comarkdown/comark) plugin that makes CommonMark's emphasis parsing work correctly with CJK text.
 
+## Installation
+
+```bash
+npm install comark-cjk comark
+```
+
 ## Usage
 
 ```ts

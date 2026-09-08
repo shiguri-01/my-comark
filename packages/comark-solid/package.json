@@ -17,6 +17,11 @@
     "name": "shiguri",
     "url": "https://github.com/shiguri-01"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/shiguri-01/my-comark.git",
+    "directory": "packages/comark-solid"
+  },
   "files": [
     "dist"
   ],
@@ -34,6 +39,7 @@
     "dev": "vp pack --watch",
     "test": "vp test",
     "check": "vp check",
+    "bump": "bumpp",
     "prepublishOnly": "vp run build"
   },
   "devDependencies": {
