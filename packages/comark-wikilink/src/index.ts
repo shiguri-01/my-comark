@@ -124,7 +124,7 @@ const createWikilinkRule =
       }
     }
 
-    state.pos = match.index + match[0].length;
+    state.pos += match[0].length;
     return true;
   };
 
