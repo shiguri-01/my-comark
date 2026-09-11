@@ -1,5 +1,11 @@
 # my-comark
 
+> **Archived:** This repository is no longer maintained. The project has been archived and no further development or support is planned.
+>
+> The `comark-solid` and `comark-wikilink` packages have moved to their own repositories:
+> - [`comark-solid`](https://github.com/shiguri-01/comark-solid)
+> - [`comark-wikilink`](https://github.com/shiguri-01/comark-wikilink)
+
 A collection of plugins and renderers for [Comark](https://github.com/Comarkdown/comark).
 
 | Package                                         | Description                          |
